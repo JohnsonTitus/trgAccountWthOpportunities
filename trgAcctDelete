@@ -1,0 +1,17 @@
+trigger trgAcctDelete on Account (before delete) {
+    
+    Set<id> accID = new Set<id>();
+    
+    for(Account a : Trigger.old){
+        accID.add(a.id);
+    }
+    
+    List<Account> accts = [select name, (select id from Opportunities) from Account where id = :accID];
+    
+    for(Account act : accts){
+        if(act.Opportunities.size() > 0){
+            act.addError('account has related opportunities');
+        }
+    }
+
+}
